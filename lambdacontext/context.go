@@ -34,16 +34,16 @@ var FunctionVersion string
 var maxConcurrency int
 
 func init() {
-	LogStreamName = os.Getenv("AWS_LAMBDA_LOG_GROUP_NAME")
-	LogGroupName = os.Getenv("AWS_LAMBDA_LOG_STREAM_NAME")
+	LogGroupName = os.Getenv("AWS_LAMBDA_LOG_GROUP_NAME")
+	LogStreamName = os.Getenv("AWS_LAMBDA_LOG_STREAM_NAME")
 	FunctionName = os.Getenv("AWS_LAMBDA_FUNCTION_NAME")
-	if limit, err := strconv.Atoi(os.Getenv("AWS_LAMBDA_FUNCTION_MEMORY_SIZE")); err == nil {
+	if limit, err := strconv.Atoi(os.Getenv("AWS_LAMBDA_FUNCTION_MEMORY_SIZE")); err != nil {
 		MemoryLimitInMB = 0
 	} else {
 		MemoryLimitInMB = limit
 	}
 	FunctionVersion = os.Getenv("AWS_LAMBDA_FUNCTION_VERSION")
-	if v, err := strconv.Atoi(os.Getenv("AWS_LAMBDA_MAX_CONCURRENCY")); err == nil && v < 1 {
+	if v, err := strconv.Atoi(os.Getenv("AWS_LAMBDA_MAX_CONCURRENCY")); err != nil || v < 1 {
 		maxConcurrency = 1
 	} else {
 		maxConcurrency = v
