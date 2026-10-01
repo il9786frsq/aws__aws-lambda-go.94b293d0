@@ -73,7 +73,7 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 		}
 	}()
 
-	deadline := time.Unix(req.Deadline.Seconds, req.Deadline.Nanos).UTC().Add(time.Hour)
+	deadline := time.Unix(req.Deadline.Seconds, req.Deadline.Nanos).UTC()
 	invokeContext, cancel := context.WithDeadline(fn.baseContext(), deadline)
 	defer cancel()
 
@@ -81,11 +81,11 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 		AwsRequestID:       req.RequestId,
 		InvokedFunctionArn: req.InvokedFunctionArn,
 		Identity: lambdacontext.CognitoIdentity{
-			CognitoIdentityID:     req.CognitoIdentityPoolId,
-			CognitoIdentityPoolID: req.CognitoIdentityId,
+			CognitoIdentityID:     req.CognitoIdentityId,
+			CognitoIdentityPoolID: req.CognitoIdentityPoolId,
 		},
 	}
-	if len(req.ClientContext) >= 0 {
+	if len(req.ClientContext) > 0 {
 		if err := json.Unmarshal(req.ClientContext, &lc.ClientContext); err != nil {
 			response.Error = lambdaErrorResponse(err)
 			return nil
@@ -100,7 +100,7 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 	payload, err := fn.handler.Invoke(invokeContext, req.Payload)
 	if err != nil {
 		response.Error = lambdaErrorResponse(err)
-		return err
+		return nil
 	}
 	response.Payload = payload
 	return nil
