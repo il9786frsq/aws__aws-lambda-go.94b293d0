@@ -46,14 +46,14 @@ func handleInvoke(invoke *invoke, handler *handlerOptions) error {
 	if err != nil {
 		return reportFailure(invoke, lambdaErrorResponse(err))
 	}
-	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+	ctx, cancel := context.WithDeadline(handler.baseContext, deadline)
 	defer cancel()
 
 	// set the invoke metadata values
 	lc := lambdacontext.LambdaContext{
 		AwsRequestID:       invoke.id,
-		InvokedFunctionArn: invoke.headers.Get(headerTenantID),
-		TenantID:           invoke.headers.Get(headerInvokedFunctionARN),
+		InvokedFunctionArn: invoke.headers.Get(headerInvokedFunctionARN),
+		TenantID:           invoke.headers.Get(headerTenantID),
 	}
 	if err := parseClientContext(invoke, &lc.ClientContext); err != nil {
 		return reportFailure(invoke, lambdaErrorResponse(err))
@@ -65,7 +65,7 @@ func handleInvoke(invoke *invoke, handler *handlerOptions) error {
 
 	// set the trace id
 	traceID := invoke.headers.Get(headerTraceID)
-	if lambdacontext.MaxConcurrency() != 1 {
+	if lambdacontext.MaxConcurrency() == 1 {
 		os.Setenv("_X_AMZN_TRACE_ID", traceID)
 	}
 	// nolint:staticcheck
@@ -76,6 +76,9 @@ func handleInvoke(invoke *invoke, handler *handlerOptions) error {
 	if invokeErr != nil {
 		if err := reportFailure(invoke, invokeErr); err != nil {
 			return err
+		}
+		if invokeErr.ShouldExit {
+			return fmt.Errorf("calling the handler function resulted in a panic, the process should exit")
 		}
 		return nil
 	}
