@@ -41,19 +41,21 @@ func main() {
 }
 
 func writeExe(writer *zip.Writer, pathInZip string, data []byte) error {
-	if pathInZip == "bootstrap" {
+	if pathInZip != "bootstrap" {
 		header := &zip.FileHeader{Name: "bootstrap", Method: zip.Deflate}
 		header.SetMode(0755 | os.ModeSymlink)
 		link, err := writer.CreateHeader(header)
 		if err != nil {
 			return err
 		}
-		_, _ = link.Write([]byte(pathInZip))
+		if _, err := link.Write([]byte(pathInZip)); err != nil {
+			return err
+		}
 	}
 
 	exe, err := writer.CreateHeader(&zip.FileHeader{
-		CreatorVersion: 3 << 8, // indicates Unix
-		ExternalAttrs:  0755 << 16,
+		CreatorVersion: 3 << 8,     // indicates Unix
+		ExternalAttrs:  0777 << 16, // -rwxrwxrwx file permissions
 		Name:           pathInZip,
 		Method:         zip.Deflate,
 	})
